@@ -10,28 +10,61 @@ function App() {
   const [imgSrc, setImgSRC] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [posts, setPosts] = useState([]);
+  const [editingPost, setEditingPost] = useState(null);
 
   const getPosts = async () => {
-    const { data: posts } = await axios.get(urlBaseServer + "/posts");
-    setPosts([...posts]);
+    try {
+      const { data: posts } = await axios.get(urlBaseServer + "/posts");
+      setPosts(posts);
+    } catch (error) {
+      console.error("Error al obtener los posts:", error);
+    }
   };
 
   const agregarPost = async () => {
-    const post = { titulo, url: imgSrc, descripcion };
-    await axios.post(urlBaseServer + "/posts", post);
-    getPosts();
+    const post = { titulo, img: imgSrc, descripcion };
+    try {
+      if (editingPost) {
+        await axios.put(urlBaseServer + `/posts/${editingPost.id}`, post);
+        alert("Post actualizado exitosamente");
+        setEditingPost(null);
+      } else {
+        await axios.post(urlBaseServer + "/posts", post);
+        alert("Post agregado exitosamente");
+      }
+      setTitulo("");
+      setImgSRC("");
+      setDescripcion("");
+      getPosts();
+    } catch (error) {
+      alert("Error al agregar/actualizar el post");
+      console.error(error);
+    }
   };
 
-  // este método se utilizará en el siguiente desafío
   const like = async (id) => {
-    await axios.put(urlBaseServer + `/posts/like/${id}`);
-    getPosts();
+    try {
+      await axios.put(urlBaseServer + `/posts/like/${id}`);
+      getPosts();
+    } catch (error) {
+      console.error("Error al actualizar los likes:", error);
+    }
   };
 
-  // este método se utilizará en el siguiente desafío
-  const eliminarPost = async (id) => {
-    await axios.delete(urlBaseServer + `/posts/${id}`);
-    getPosts();
+  const deleteLikes = async (id) => {
+    try {
+      await axios.delete(urlBaseServer + `/posts/${id}`);
+      getPosts();
+    } catch (error) {
+      console.error("Error al eliminar el post:", error);
+    }
+  };
+
+  const startEditing = (post) => {
+    setTitulo(post.titulo);
+    setImgSRC(post.img);
+    setDescripcion(post.descripcion);
+    setEditingPost(post);
   };
 
   useEffect(() => {
@@ -48,6 +81,9 @@ function App() {
             setImgSRC={setImgSRC}
             setDescripcion={setDescripcion}
             agregarPost={agregarPost}
+            titulo={titulo}
+            imgSrc={imgSrc}
+            descripcion={descripcion}
           />
         </div>
         <div className="col-12 col-sm-8 px-5 row posts align-items-start">
@@ -56,7 +92,8 @@ function App() {
               key={i}
               post={post}
               like={like}
-              eliminarPost={eliminarPost}
+              deleteLikes={deleteLikes}
+              startEditing={startEditing}
             />
           ))}
         </div>
@@ -66,3 +103,5 @@ function App() {
 }
 
 export default App;
+
+

@@ -1,14 +1,13 @@
-function Post({
-  post: { id, titulo, img, descripcion, likes },
-  like,
-  eliminarPost,
-}) {
+function Post({ post: { id, titulo, img, descripcion, likes }, like, deleteLikes, startEditing }) {
   return (
     <div className="card col-12 col-sm-4 d-inline mx-0 px-3">
-      <div className="card-body  p-0">
+      <div className="card-body p-0">
         <img
-          className="card-img-top "
+          className="card-img-top"
           src={img}
+          alt={titulo}
+          onClick={() => startEditing({ id, titulo, img, descripcion })}
+          style={{ cursor: "pointer" }}
         />
         <div className="p-3">
           <h4 className="card-title">{titulo}</h4>
@@ -17,15 +16,15 @@ function Post({
             <div>
               <i
                 onClick={() => like(id)}
-                className={`fa-heart fa-xl ${
-                  likes ? "fa-solid" : "fa-regular"
-                }`}
+                className={`fa-heart fa-xl ${likes ? "fa-solid" : "fa-regular"}`}
+                style={{ cursor: "pointer" }}
               ></i>
               <span className="ms-1">{likes}</span>
             </div>
             <i
-              onClick={() => eliminarPost(id)}
+              onClick={() => deleteLikes(id)}
               className="fa-solid fa-x"
+              style={{ cursor: "pointer" }}
             ></i>
           </div>
         </div>
@@ -35,3 +34,7 @@ function Post({
 }
 
 export default Post;
+
+
+
+
